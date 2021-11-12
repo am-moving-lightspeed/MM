@@ -3,8 +3,8 @@ from numpy import array
 from numpy import ndarray
 from numpy import sum
 
-import m01.brv_supplier as sup
-import m01.investigator as inv
+import task_01.brv_supplier as sup
+import task_01.investigator as inv
 
 
 fig, axs = plt.subplots(3, 2)
