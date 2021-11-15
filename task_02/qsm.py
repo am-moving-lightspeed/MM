@@ -2,7 +2,6 @@ import math
 
 from numpy.random import exponential
 from simpy import Environment
-from simpy.resources.resource import Request
 from simpy.resources.resource import Resource
 
 from task_02.statistics import Statistics
@@ -82,17 +81,9 @@ class QSM:
                 In case a queue is unbounded, request is simply put in the queue and awaits 
                 it's  time, then it's processed.
                 """
-                yield QSM._process_in_infinite_queue(env, request_id, request, model)
-
-
-    @staticmethod
-    def _process_in_infinite_queue(env: Environment
-                                   , request_id: int
-                                   , request: Request
-                                   , model: 'QSM'):
-        start_tstamp = env.now
-        yield request
-        model.stats.time_spent_awaiting.append(env.now - start_tstamp)  # stats
-        yield env.process(model._processing(request_id))
-        model.stats.time_spent_total.append(env.now - start_tstamp)  # stats
-        model.stats.requests_completed_amount += 1  # stats
+                start_tstamp = env.now
+                yield request
+                model.stats.time_spent_awaiting.append(env.now - start_tstamp)  # stats
+                yield env.process(model._processing(request_id))
+                model.stats.time_spent_total.append(env.now - start_tstamp)  # stats
+                model.stats.requests_completed_amount += 1  # stats

@@ -50,7 +50,7 @@ class Statistics:
 
         """
         P -- array of probabilities. P[i] is the probability, that
-        req_proc_and_await_at_time[i] < i.
+        req_proc_and_await_at_time[i] == i.
         """
         P = []
         """
@@ -88,8 +88,8 @@ class Statistics:
         avg_req_time_in_system = self.get_average_time_of_request_spent_in_system()
         avg_req_time_in_queue = self.get_average_time_of_request_spent_in_queue()
 
-        return (P, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
-                avg_req_time_in_queue, avg_busy_channels)
+        return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
+                avg_req_time_in_queue)
 
 
     def find_theoretical_probs(self):
@@ -98,7 +98,7 @@ class Statistics:
 
         """
         P -- array of probabilities. P[i] is the probability, that
-        req_proc_and_await_at_time[i] < i.
+        req_proc_and_await_at_time[i] == i.
         """
         P: list = []
         p00 = sum([ro ** i / factorial(i) for i in range(self.model.channels_no + 1)])
@@ -143,5 +143,5 @@ class Statistics:
         avg_req_time_in_system = avg_req_in_system / self.model.requests_rt
         avg_req_time_in_queue = Q * ro / self.model.requests_rt
 
-        return (P, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
-                avg_req_time_in_queue, '')
+        return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
+                avg_req_time_in_queue)
