@@ -16,17 +16,17 @@ from task_02.util import log_probabilities
 # service_rt = 5
 # v_param = 1
 
-# channels_no = 5
-# max_queue_sz = 10
-# requests_rt = 100
-# service_rt = 10
-# v_param = 1
-
-channels_no = 2
-max_queue_sz = 1
-requests_rt = 10
-service_rt = 5
+channels_no = 5
+max_queue_sz = 10
+requests_rt = 100
+service_rt = 10
 v_param = 1
+
+# channels_no = 2
+# max_queue_sz = 1
+# requests_rt = 10
+# service_rt = 5
+# v_param = 1
 
 env = simpy.Environment()
 model = QSM(env, channels_no, max_queue_sz, requests_rt, service_rt, v_param)
