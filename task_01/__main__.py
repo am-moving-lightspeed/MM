@@ -7,28 +7,36 @@ import task_01.brv_supplier as sup
 import task_01.investigator as inv
 
 
-fig, axs = plt.subplots(3, 2)
+def draw_histogram(A, B, empiric_matrix, theoretic_matrix):
+    fig, axs = plt.subplots(2, 2)
+    x1_emp_probability = sum(empiric_matrix, axis = 1)
+    x2_emp_probability = sum(empiric_matrix, axis = 0)
+    x1_theor_probability = sum(theoretic_matrix, axis = 1)
+    x2_theor_probability = sum(theoretic_matrix, axis = 0)
 
-
-def draw_histogram(A, B, empiric_matrix):
-    x1_probability = sum(empiric_matrix, axis = 1)
-    x2_probability = sum(empiric_matrix, axis = 0)
-    axs[0][0].bar(A, x1_probability)
-    axs[0][1].bar(B, x2_probability, color = 'red')
-    axs[0][0].legend(['X1'])
-    axs[0][1].legend(['X2'])
+    axs[0][0].bar(A, x1_emp_probability, color = 'green')
+    axs[0][1].bar(B, x2_emp_probability, color = 'green')
+    axs[1][0].bar(A, x1_theor_probability, color = 'grey')
+    axs[1][1].bar(B, x2_theor_probability, color = 'grey')
+    axs[0][0].legend(['X1 emp.'])
+    axs[0][1].legend(['X2 emp.'])
+    axs[1][0].legend(['X1 theor.'])
+    axs[1][1].legend(['X2 theor.'])
 
 
 def print_interval_estimation(no: int, n, M, D, probabilities_for_M_int,
                               probabilities_for_D_int):
     print(f'<<<----     Интервальные оценки для x{no}     ---->>>', '\nДля мат. ожидания:')
+
+    fig, axs = plt.subplots(2)
     deltas = []
     for prob in probabilities_for_M_int:
         delta, interval = investigator.M_confidence_interval(n, M, D, prob)
         deltas.append(delta)
         print('Доверительный интервал для мат. ожидания при доверительной вероятности',
               f'{prob} и n = {n}: {str(interval)}')
-    axs[1][no - 1].plot(probabilities_for_M_int, list(map(lambda x: x * 2, deltas)))
+    axs[0].plot(probabilities_for_M_int, list(map(lambda x: x * 2, deltas)))
+    axs[0].legend([f'x{no} interval for M'])
 
     print('\nДля дисперсии:')
     deltas = []
@@ -41,9 +49,13 @@ def print_interval_estimation(no: int, n, M, D, probabilities_for_M_int,
         intervals.append(interval)
         print('Доверительный интервал для дисперсии при доверительной вероятности',
               f'{prob[1]} и n = {n}: {str(interval)}')
-    axs[2][no - 1].plot(D_probs, list(map(lambda x: x[1] - x[0], intervals)))
+    axs[1].plot(D_probs, list(map(lambda x: x[1] - x[0], intervals)))
+    axs[1].legend([f'x{no} interval for D'])
+
     print('>>>----     --------------------------     ----<<<\n')
 
+
+####
 
 P = array([
   [0.2, 0.3],
@@ -52,6 +64,9 @@ P = array([
 ])
 A = array([1, 2, 4])
 B = array([1, 3])
+
+####
+
 print('Теоретическая матрица:')
 print(P, "\n")
 
@@ -63,7 +78,7 @@ print('Эмпирическая матрица (n = 10000):\n', investigator.bui
 print('Эмпирическая матрица (n = 100000):\n',
       empiric_matrix := investigator.build_empiric_matrix(100000),
       '\n')
-draw_histogram(A, B, empiric_matrix)
+draw_histogram(A, B, empiric_matrix, P)
 
 n = 10000
 X = array([sup.TwoDimensionalRandomValue.get(P, A, B) for i in range(n)])
