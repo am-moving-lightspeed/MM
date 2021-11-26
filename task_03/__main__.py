@@ -8,29 +8,12 @@ from numpy import array
 from numpy import prod
 
 from task_02.qsm import QSM
-from task_02.util import draw_probabilities_histograms
-from task_02.util import draw_probabilities_of_amount_of_requests_in_system_histograms
 from task_02.util import log_average_values_comparison
-from task_02.util import log_given
 from task_02.util import log_probabilities
-
-
-def log_probabilities_and_average_values(*args) -> None:
-    (P, A, P_rejected,
-     avg_req_in_system, avg_req_in_queue,
-     avg_req_time_in_system, avg_req_time_in_queue,
-     avg_busy_channels) = args
-
-    print('\tP-probabilities:')
-    for i, prob in enumerate(P):
-        print(f'\t\tP{i}: {prob}')
-    print(f'\tAbsolute throughput: {A}')
-    print(f'\tProbability for a request to be rejected: {P_rejected}')
-    print(f'\tAverage amount of requests in the system: {avg_req_in_system}')
-    print(f'\tAverage amount of requests in a queue: {avg_req_in_queue}')
-    print(f'\tAverage time of request spent in the system: {avg_req_time_in_system}')
-    print(f'\tAverage time of request spent in the queue: {avg_req_time_in_queue}')
-    print(f'\tAverage amount of busy channels: {avg_busy_channels}')
+from task_03.util import draw_P_comparison_histograms
+from task_03.util import draw_P_sub_comparison_histograms
+from task_03.util import draw_probabilities_of_amount_of_requests_in_system_histograms
+from task_03.util import draw_values_comparison_bars
 
 
 def find_empiric_probs(model: QSM) -> Tuple:
@@ -114,6 +97,7 @@ def find_theoretical_probs(model: QSM, channels_no: int, max_queue_sz: int) -> T
     return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
             avg_req_time_in_queue)
 
+
 ####
 
 # channels_no = inf
@@ -124,40 +108,114 @@ def find_theoretical_probs(model: QSM, channels_no: int, max_queue_sz: int) -> T
 
 channels_no = inf
 max_queue_sz = inf
-requests_rt = 15
 service_rt = 0.4
 v_param = 1.5
 
-####
+#### case 1
+
+requests_rt_1 = 15
 
 env = simpy.Environment()
-model = QSM(env, channels_no, max_queue_sz, requests_rt, service_rt, v_param)
-
+model = QSM(env, channels_no, max_queue_sz, requests_rt_1, service_rt, v_param)
 env.process(QSM.run(env, model))
-env.run(until = 100)  # 300 minutes
+env.run(until = 2000)
 
-empiric_values = find_empiric_probs(model)
-P_dim = len(empiric_values[0]) - 1
-theoretic_values = find_theoretical_probs(model, P_dim, 1)
+empiric_values_1 = find_empiric_probs(model)
+P_dim = len(empiric_values_1[0]) - 1
+theoretic_values_1 = find_theoretical_probs(model, P_dim, 1)
 
-P_emp = empiric_values[0]
-P_theor = theoretic_values[0]
-
-values_to_compare = [values for values in zip(empiric_values[1:], theoretic_values[1:])]
-requests_in_system_at_time = add(
+values_to_compare_1 = [values for values in zip(empiric_values_1[1:], theoretic_values_1[1:])]
+requests_in_system_at_time_1 = add(
   array(model.stats.requests_processing)
   , array(model.stats.requests_awaiting)
 )
 
+P_emp_1 = empiric_values_1[0]
+P_theor_1 = theoretic_values_1[0]
+
+log_probabilities(P_emp_1, P_theor_1)
+log_average_values_comparison(*values_to_compare_1)
+
+#### case 2
+
+requests_rt_2 = 3
+
+env = simpy.Environment()
+model = QSM(env, channels_no, max_queue_sz, requests_rt_2, service_rt, v_param)
+env.process(QSM.run(env, model))
+env.run(until = 2000)
+
+empiric_values_2 = find_empiric_probs(model)
+P_dim = len(empiric_values_2[0]) - 1
+theoretic_values_2 = find_theoretical_probs(model, P_dim, 1)
+
+values_to_compare_2 = [values for values in zip(empiric_values_2[1:], theoretic_values_2[1:])]
+requests_in_system_at_time_2 = add(
+  array(model.stats.requests_processing)
+  , array(model.stats.requests_awaiting)
+)
+
+P_emp_2 = empiric_values_2[0]
+P_theor_2 = theoretic_values_2[0]
+
+log_probabilities(P_emp_2, P_theor_2)
+log_average_values_comparison(*values_to_compare_2)
+
+#### case 3
+
+requests_rt_3 = 32
+
+env = simpy.Environment()
+model = QSM(env, channels_no, max_queue_sz, requests_rt_3, service_rt, v_param)
+env.process(QSM.run(env, model))
+env.run(until = 2000)
+
+empiric_values_3 = find_empiric_probs(model)
+P_dim = len(empiric_values_3[0]) - 1
+theoretic_values_3 = find_theoretical_probs(model, P_dim, 1)
+
+values_to_compare_3 = [values for values in zip(empiric_values_3[1:], theoretic_values_3[1:])]
+requests_in_system_at_time_3 = add(
+  array(model.stats.requests_processing)
+  , array(model.stats.requests_awaiting)
+)
+
+P_emp_3 = empiric_values_3[0]
+P_theor_3 = theoretic_values_3[0]
+
+log_probabilities(P_emp_3, P_theor_3)
+log_average_values_comparison(*values_to_compare_3)
+
 ####
 
-log_given(channels_no, max_queue_sz, requests_rt, service_rt, v_param)
+prefix = 'When requests rate is %d'
+titles = [prefix % requests_rt_1, prefix % requests_rt_2, prefix % requests_rt_3]
+draw_P_comparison_histograms(P_emp_1, P_emp_2, P_emp_3, titles = titles)
+draw_P_comparison_histograms(P_theor_1, P_theor_2, P_theor_3, titles = titles)
+draw_P_sub_comparison_histograms(
+  (P_emp_1, P_theor_1)
+  , (P_emp_2, P_theor_2)
+  , (P_emp_3, P_theor_3)
+  , titles = titles
+)
 
-log_probabilities(P_emp, P_theor)
+draw_values_comparison_bars(
+  values_to_compare_1[3]
+  , values_to_compare_2[3]
+  , values_to_compare_3[3]
+  , titles = ['Сред. число заявок в СМО'] * 3
+)
+draw_values_comparison_bars(
+  values_to_compare_1[5]
+  , values_to_compare_2[5]
+  , values_to_compare_3[5]
+  , titles = ['Сред. время пребывания заявки в СМО'] * 3
+)
 
-log_average_values_comparison(*values_to_compare)
-
-draw_probabilities_histograms(array(P_emp), array(P_theor))
-
-draw_probabilities_of_amount_of_requests_in_system_histograms(requests_in_system_at_time,
-                                                              P_theor)
+for i in range(min(len(P_theor_1), len(P_theor_2), len(P_theor_3))):
+    draw_probabilities_of_amount_of_requests_in_system_histograms(
+      (requests_in_system_at_time_1, P_theor_1)
+      , (requests_in_system_at_time_2, P_theor_2)
+      , (requests_in_system_at_time_3, P_theor_3)
+      , count = i
+    )

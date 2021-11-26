@@ -25,6 +25,7 @@ def log_given(*args) -> None:
 def log_probabilities(P_emp: ndarray, P_theor: ndarray) -> None:
     final_probabilities_info = tbl.PrettyTable()
 
+    final_probabilities_info.add_column("Кол-во заявок в СМО", list(range(len(P_emp))), align = 'r')
     final_probabilities_info.add_column("Эмпирические финальные вероятности",
                                         around(P_emp, _round_to))
     final_probabilities_info.add_column("Теоретические финальные вероятности",
