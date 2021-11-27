@@ -29,6 +29,10 @@ class Statistics:
         return add(array(self.requests_awaiting), array(self.requests_processing)).tolist()
 
 
+    def get_average_amount_of_requests_processed_at_time(self) -> float:
+        return array(self.requests_processing).mean()
+
+
     def get_average_amount_of_requests_in_system_at_time(self) -> float:
         return array(self.get_amounts_of_requests_in_system_at_time()).mean()
 
@@ -81,15 +85,14 @@ class Statistics:
         """
         A = Q * self.model.requests_rt
 
-        avg_busy_channels = Q * self.model.requests_rt / self.model.service_rt
-
         avg_req_in_system = self.get_average_amount_of_requests_in_system_at_time()
+        avg_req_processed = self.get_average_amount_of_requests_processed_at_time()
         avg_req_in_queue = self.get_average_amount_of_requests_in_queue_at_time()
         avg_req_time_in_system = self.get_average_time_of_request_spent_in_system()
         avg_req_time_in_queue = self.get_average_time_of_request_spent_in_queue()
 
         return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
-                avg_req_time_in_queue)
+                avg_req_time_in_queue, avg_req_processed)
 
 
     def find_theoretical_probs(self):
@@ -140,8 +143,9 @@ class Statistics:
           for index in range(1, self.model.max_queue_sz + 1)
         ])
 
+        avg_req_processed = A / self.model.service_rt
         avg_req_time_in_system = avg_req_in_system / self.model.requests_rt
         avg_req_time_in_queue = Q * ro / self.model.requests_rt
 
         return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
-                avg_req_time_in_queue)
+                avg_req_time_in_queue, avg_req_processed)

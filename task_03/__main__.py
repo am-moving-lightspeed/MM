@@ -58,12 +58,13 @@ def find_empiric_probs(model: QSM) -> Tuple:
     avg_busy_channels = A / sts.model.service_rt
 
     avg_req_in_system = sts.get_average_amount_of_requests_in_system_at_time()
+    avg_req_processed = sts.get_average_amount_of_requests_processed_at_time()
     avg_req_in_queue = 0
     avg_req_time_in_system = sts.get_average_time_of_request_spent_in_system()
     avg_req_time_in_queue = 0
 
     return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
-            avg_req_time_in_queue)
+            avg_req_time_in_queue, avg_req_processed)
 
 
 def find_theoretical_probs(model: QSM, channels_no: int, max_queue_sz: int) -> Tuple:
@@ -90,12 +91,13 @@ def find_theoretical_probs(model: QSM, channels_no: int, max_queue_sz: int) -> T
     Q = 1
     A = Q * model.requests_rt
     avg_req_in_system = model.requests_rt * 1 / model.service_rt
+    avg_req_processed = A / model.service_rt
     avg_req_in_queue = 0
     avg_req_time_in_system = 1 / model.service_rt
     avg_req_time_in_queue = 0
 
     return (P, Q, A, P_rejected, avg_req_in_system, avg_req_in_queue, avg_req_time_in_system,
-            avg_req_time_in_queue)
+            avg_req_time_in_queue, avg_req_processed)
 
 
 ####
